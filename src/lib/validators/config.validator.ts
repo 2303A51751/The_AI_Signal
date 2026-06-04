@@ -21,8 +21,10 @@ import { z } from 'zod';
 // ─────────────────────────────────────────────
 
 const SafeString = z.string().catch('');
-const SafeNonEmptyString = (fallback: string) =>
-  z.string().min(1).catch(fallback);
+const SafeNonEmptyString = (fallback: string | (() => string)) =>
+  typeof fallback === 'function'
+    ? z.string().min(1).catch(() => fallback())
+    : z.string().min(1).catch(fallback);
 
 const SafeNumber = z.number().catch(0);
 const SafeBoolean = z.boolean().catch(false);

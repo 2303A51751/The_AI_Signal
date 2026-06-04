@@ -156,7 +156,7 @@ export async function executeWorkflows(
   let triggered = 0;
 
   for (const workflow of allWorkflows) {
-    if (!shouldTrigger(workflow, ctx)) continue;
+    if (!shouldTrigger(workflow as WorkflowTrigger, ctx)) continue;
     triggered++;
 
     for (const action of workflow.actions) {
@@ -194,8 +194,8 @@ export async function executeWorkflows(
         appId: ctx.appId,
         trigger: ctx.trigger,
         entity: ctx.entity,
-        payload: ctx.payload ?? {},
-        actions: actionsRun,
+        payload: (ctx.payload ?? {}) as any,
+        actions: actionsRun as any,
         status: actionsRun.some((a) => a.status === 'failed') ? 'failed' : 'success',
       },
     })

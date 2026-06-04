@@ -22,10 +22,10 @@ export function errorResponse(error: string, status = 400, details?: unknown): N
  * Converts ZodErrors into structured 422 responses.
  * Prevents any 500 from leaking unformatted stack traces.
  */
-export function withErrorHandler(
-  handler: (req: Request, ctx?: any) => Promise<NextResponse>
+export function withErrorHandler<T extends Request = Request>(
+  handler: (req: T, ctx?: any) => Promise<Response>
 ) {
-  return async (req: Request, ctx?: any): Promise<NextResponse> => {
+  return async (req: T, ctx?: any): Promise<Response> => {
     try {
       return await handler(req, ctx);
     } catch (err) {
