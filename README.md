@@ -3,8 +3,8 @@
 A production-grade, metadata-driven runtime that converts dynamic JSON configurations into fully working frontend UIs, REST APIs, and database structures. Inspired by low-code platforms like Base44.
 
 ---
-
-## Architecture Overview
+****Live Demo:  https://the-ai-signal-sax9.vercel.app/dashboard
+****## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -118,101 +118,6 @@ Each action handler is individually try-caught. A failing webhook doesn't preven
 
 ### 5. Config Repair + Export Round-trip
 When a config is saved, the raw blob is stored alongside the repaired version. The export endpoint always returns the **repaired** config (guaranteed valid) with a repair report. This means exported configs are always clean and re-importable.
-
----
-
-## Setup & Deployment
-
-### Prerequisites
-- Node.js 20+
-- PostgreSQL database (Neon, Railway, or Supabase recommended)
-
-### Local Development
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Configure environment
-cp .env.example .env.local
-# Edit .env.local and set DATABASE_URL
-
-# 3. Push schema to database
-npm run db:push
-
-# 4. Seed demo data
-npm run db:seed
-
-# 5. Start development server
-npm run dev
-```
-
-Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
-
-### Vercel Deployment
-
-```bash
-# Deploy to Vercel
-vercel --prod
-
-# Set environment variables in Vercel dashboard:
-# DATABASE_URL = your Neon/Railway PostgreSQL URL
-```
-
-### Railway Deployment
-
-```bash
-# Connect your repo to Railway
-# Railway auto-detects Next.js and runs npm run build
-# Add DATABASE_URL in Railway environment variables
-```
-
----
-
-## Integrating Real Authentication
-
-Replace the mock `getUserId()` in `src/lib/api-helpers.ts` with your auth provider:
-
-```typescript
-// NextAuth example
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-
-export async function getUserId(req: Request): Promise<string> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error('Unauthorized');
-  return session.user.id;
-}
-```
-
----
-
-## Adding New Component Types
-
-1. Create your component in `src/components/ui/YourComponent.tsx`
-2. Register it in `src/components/registry/ComponentRegistry.tsx`:
-   ```typescript
-   YourComponent: { component: YourComponent, displayName: 'Your Component' }
-   ```
-3. Add the type to the `ComponentType` union in `src/types/config.ts`
-4. Add it to the `ComponentTypeSchema` enum in `src/lib/validators/config.validator.ts`
-
-The LayoutEngine will automatically route to it. Unknown types still fail gracefully.
-
----
-
-## Adding New Workflow Actions
-
-In `src/lib/runtime/workflow-engine.ts`, add to `actionHandlers`:
-
-```typescript
-myAction: async (action, ctx) => {
-  // Your integration (Slack, email, CRM webhook, etc.)
-  return { delivered: true };
-},
-```
-
-Then add `'myAction'` to the `ActionTypeSchema` enum in `config.validator.ts`.
 
 ---
 
